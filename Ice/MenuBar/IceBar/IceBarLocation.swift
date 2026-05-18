@@ -16,6 +16,9 @@ enum IceBarLocation: Int, CaseIterable, Identifiable {
     /// The Ice Bar will appear centered below the Ice icon.
     case iceIcon = 2
 
+    /// The Ice Bar will appear centered below the menu bar.
+    case centered = 3
+
     var id: Int { rawValue }
 
     /// Localized string key representation.
@@ -24,6 +27,7 @@ enum IceBarLocation: Int, CaseIterable, Identifiable {
         case .dynamic: "Dynamic"
         case .mousePointer: "Mouse pointer"
         case .iceIcon: "Ice icon"
+        case .centered: "Centered"
         }
     }
 }

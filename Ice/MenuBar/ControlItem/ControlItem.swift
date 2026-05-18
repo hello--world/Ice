@@ -480,6 +480,11 @@ final class ControlItem {
                     return
                 }
 
+                if appState?.settings.general.useIceBar == true, sectionName == .visible {
+                    toggleIceBar()
+                    return
+                }
+
                 if
                     let section = menuBarManager.section(withName: sectionName),
                     section.isEnabled
@@ -492,6 +497,17 @@ final class ControlItem {
         default:
             return
         }
+    }
+
+    /// Toggles the Ice Bar from the main Ice menu bar icon.
+    private func toggleIceBar() {
+        guard
+            let appState,
+            let hiddenSection = appState.menuBarManager.section(withName: .hidden)
+        else {
+            return
+        }
+        hiddenSection.toggle()
     }
 
     /// Creates a menu to show under the control item.

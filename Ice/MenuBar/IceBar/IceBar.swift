@@ -110,21 +110,30 @@ final class IceBarPanel: NSPanel {
 
         func getOrigin(for iceBarLocation: IceBarLocation) -> CGPoint {
             let menuBarHeight = screen.getMenuBarHeight() ?? 0
-            let originY = ((screen.frame.maxY - 1) - menuBarHeight) - frame.height
+            let verticalOffset: CGFloat = screen.hasNotch ? 6 : 4
+            let originY = ((screen.frame.maxY - 1) - menuBarHeight) - frame.height - verticalOffset
 
             var originForRightOfScreen: CGPoint {
                 CGPoint(x: screen.frame.maxX - frame.width, y: originY)
             }
 
-            switch iceBarLocation {
-            case .dynamic:
-                if appState.hidEventManager.isMouseInsideEmptyMenuBarSpace(appState: appState, screen: screen) {
-                    return getOrigin(for: .mousePointer)
+            var originForCenterOfScreen: CGPoint {
+                let lowerBound = screen.frame.minX
+                let upperBound = screen.frame.maxX - frame.width
+
+                guard lowerBound <= upperBound else {
+                    return originForRightOfScreen
                 }
-                return getOrigin(for: .iceIcon)
+
+                return CGPoint(x: (screen.frame.midX - frame.width / 2).clamped(to: lowerBound...upperBound), y: originY)
+            }
+
+            switch iceBarLocation {
+            case .dynamic, .centered:
+                return originForCenterOfScreen
             case .mousePointer:
                 guard let location = MouseHelpers.locationAppKit else {
-                    return getOrigin(for: .iceIcon)
+                    return originForCenterOfScreen
                 }
 
                 let lowerBound = screen.frame.minX
@@ -322,10 +331,13 @@ private struct IceBarContentView: View {
                 .frame(height: contentHeight)
                 .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, verticalPadding)
-                .menuBarItemContainer(appState: appState, colorInfo: colorManager.colorInfo)
-                .foregroundStyle(colorManager.colorInfo?.color.brightness ?? 0 > 0.67 ? .black : .white)
+                .background {
+                    VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
+                        .overlay(Color.black.opacity(0.35))
+                }
+                .foregroundStyle(.white)
                 .clipShape(clipShape)
-                .shadow(color: .black.opacity(shadowOpacity), radius: 2.5)
+                .shadow(color: .black.opacity(shadowOpacity), radius: 8, y: 2)
 
             if configuration.current.hasBorder {
                 clipShape
@@ -335,9 +347,13 @@ private struct IceBarContentView: View {
             }
         }
         .padding(5)
-        .frame(maxWidth: screen.frame.width)
+        .frame(maxWidth: maxBarWidth)
         .fixedSize()
         .onFrameChange(update: $frame)
+    }
+
+    private var maxBarWidth: CGFloat? {
+        max(160, screen.frame.width - 120)
     }
 
     @ViewBuilder

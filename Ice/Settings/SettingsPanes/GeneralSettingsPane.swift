@@ -196,11 +196,13 @@ struct GeneralSettingsPane: View {
         .annotation {
             switch settings.iceBarLocation {
             case .dynamic:
-                Text("The Ice Bar's location changes based on context.")
+                Text("The Ice Bar is centered below the menu bar by default.")
             case .mousePointer:
                 Text("The Ice Bar is centered below the mouse pointer.")
             case .iceIcon:
                 Text("The Ice Bar is centered below the Ice icon.")
+            case .centered:
+                Text("The Ice Bar is centered below the menu bar.")
             }
         }
     }

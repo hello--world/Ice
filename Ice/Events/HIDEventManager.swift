@@ -176,6 +176,7 @@ extension HIDEventManager {
     private func handleShowOnClick(appState: AppState, screen: NSScreen) {
         guard
             appState.settings.general.showOnClick,
+            !appState.settings.general.useIceBar,
             isMouseInsideEmptyMenuBarSpace(appState: appState, screen: screen)
         else {
             return
@@ -332,6 +333,7 @@ extension HIDEventManager {
         // Make sure the "ShowOnHover" feature is enabled and allowed.
         guard
             appState.settings.general.showOnHover,
+            !appState.settings.general.useIceBar,
             appState.menuBarManager.showOnHoverAllowed
         else {
             return
@@ -423,6 +425,7 @@ extension HIDEventManager {
     private func handleShowOnScroll(with event: NSEvent, appState: AppState, screen: NSScreen) {
         guard
             appState.settings.general.showOnScroll,
+            !appState.settings.general.useIceBar,
             isMouseInsideMenuBar(appState: appState, screen: screen),
             let hiddenSection = appState.menuBarManager.section(withName: .hidden)
         else {
