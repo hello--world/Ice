@@ -1,0 +1,48 @@
+name: Build Ice App
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build.yml"
+      - "Ice.xcodeproj/**"
+      - "Ice/**"
+      - "MenuBarItemService/**"
+      - "Package.resolved"
+  pull_request:
+    paths:
+      - ".github/workflows/build.yml"
+      - "Ice.xcodeproj/**"
+      - "Ice/**"
+      - "MenuBarItemService/**"
+      - "Package.resolved"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app
+        run: |
+          xcodebuild \
+            -project Ice.xcodeproj \
+            -scheme Ice \
+            -configuration Release \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package app
+        run: |
+          mkdir -p build/artifacts
+          ditto -c -k --keepParent \
+            build/DerivedData/Build/Products/Release/Ice.app \
+            build/artifacts/Ice.app.zip
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ice.app
+          path: build/artifacts/Ice.app.zip
+          if-no-files-found: error
