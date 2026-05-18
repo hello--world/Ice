@@ -28,8 +28,11 @@ jobs:
           xcodebuild \
             -project Ice.xcodeproj \
             -scheme Ice \
+            -destination "platform=macOS,arch=arm64" \
             -configuration Release \
             -derivedDataPath build/DerivedData \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO \
             build
 
